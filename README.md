@@ -4,7 +4,7 @@ This is intended to be a minimilistic implementation of Atoms. We will define an
 
 It may be useful to also define 3 specific types of atoms.  
 root atom:  
-> The basic atom, which as no dependencies on other atoms. Always writable.  
+> The basic atom, which has no dependencies on other atoms. Always writable.  
 
 lensed atom:  
 > An atom which views a slice of another atom. It is writable if its source is writable. Writes will propagate to the top-most writable source atom.  
