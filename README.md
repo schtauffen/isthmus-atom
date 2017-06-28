@@ -42,21 +42,20 @@ There is a umd version available under `@isthmus/atom/dist/atom.js`:
 ## API
 Note that all functions without optional arguments are curried with `R.curry`.
 
-  * [Atom](#Atom)
-  * [atom](#atom)
+  * [Atom](#atom)
   * [combine](#combine)
   * [map](#map)
   * [view](#view)
-  * [isAtom](#isAtom)
+  * [isAtom](#isatom)
   * [modify](#modify)
   * [scan](#scan)
   * [merge](#merge)
-  * [scanMerge](#scanMerge)
+  * [scanMerge](#scanmerge)
   * [end](#end)
   * [log](#log)
-  * [toJSON](#toJSON)
-  * [valueOf](#valueOf)
-  * [HALT](#HALT)
+  * [toJSON](#tojson)
+  * [valueOf](#valueof)
+  * [HALT](#halt)
 
 ### Atom
 > Atom(any?) -> atom  
