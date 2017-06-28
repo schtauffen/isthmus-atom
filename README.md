@@ -5,8 +5,10 @@ This is intended to be a minimilistic implementation of Atoms. We will define an
 It may be useful to also define 3 specific types of atoms.  
 root atom:  
 > The basic atom, which as no dependencies on other atoms. Always writable.  
+
 lensed atom:  
 > An atom which views a slice of another atom. It is writable if its source is writable. Writes will propagate to the top-most writable source atom.  
+
 computed atom:  
 > Computes from other atoms. Always readonly.  
 
@@ -58,6 +60,7 @@ Note that all functions without optional arguments are curried with `R.curry`.
 
 ### Atom
 > Atom(any?) -> atom  
+
 `Atom` is a function which returns a root atom. It optionally can receive an initial value as its argument.  
 ```js
 const state = Atom({ foo: { bar: [1, 2, 3] } })
@@ -65,6 +68,7 @@ const state = Atom({ foo: { bar: [1, 2, 3] } })
 
 ### atom
 > atom(any?) -> atom | any  
+
 `atom`s are functions which can be called with an argument to set its current value.  
 ```js
 const atom = Atom(1) // 1
@@ -77,6 +81,7 @@ x = atom() + 1 // 8
 
 ### combine
 > combine(fn, sources[]) -> computed atom  
+
 `combine` is a function which returns a computed atom from one or more atoms.  
 ```js
 const n = Atom(7) 
@@ -88,6 +93,7 @@ m(3) // sum: 10
 
 ### map
 > map(fn, source) -> computed atom  
+
 `map` is an aliased version of combine for when mapping from just one atom.  
 ```js
 const n = Atom(3)
@@ -100,6 +106,7 @@ const doubled = n.map(R.multiply(2)) // 6
 
 ### view
 > view(lens, atom) --> lensed atom  
+
 `view` returns a lensed atom. It can receive a string, number or array of the two which will be passed onto `R.lensProp`, `R.lensIndex` and `R.lensPath`, resp.  
 ```js
 const source = Atom({ foo: [1, 2, 3] })
@@ -117,6 +124,7 @@ const head = atom.view(0) // 'a'
 
 ### isAtom
 > isAtom(any) -> boolean  
+
 `isAtom` is a helper function which returns if the given argument is an atom.  
 ```js
 const source = Atom([1, 2, 3]) // [1, 2, 3]
@@ -134,6 +142,7 @@ isAtom({ foo: 'bar' }) // false
 
 ### modify
 > modify(fn, atom) -> atom  
+
 `modify` accepts a function which will receive the current value of the given atom. Its returned value will be set on the atom.    
 It returns the atom being modified so it can be chained.  
 ```js
@@ -147,6 +156,7 @@ atom.modify(R.add(10)) // atom: 20
 
 ### scan
 > scan(fn, seed, atom) -> computed atom  
+
 `scan` accepts an accumulator function and seed. Note that it fires immediately with any current value of its parent atom.  
 ```js
 const nums = Atom(1)
@@ -162,6 +172,7 @@ document.addEventListener('click', clicks)
 
 ### merge
 > merge(atom1, atom2) -> computed atom  
+
 `merge` returns a computed atom from two sources. It has the value of whichever last updated. It will initialize as the value of the second atom passed in.  
 ```js
 const atom1 = Atom(1)
@@ -173,6 +184,7 @@ atom1(1) // merged: 1
 
 ### scanMerge
 > scanMerge(pairs, seed)  
+
 `scanMerge` accepts an array of arrays which contain an accumulator function and its atom, and a seed.  
 The resulting atom will update whenever one of its sources does according to the related accumulator function.  
 ```js
@@ -193,6 +205,7 @@ s3(8) // scanmerged: -2
 
 ### log
 > log(values[])  
+
 `log` is a helper function intended for development use which logs values given to it. If they are an atom, it will print its current value.  
 ```js
 const atom = Atom('bar')
@@ -252,6 +265,7 @@ Notes:
 
 ### end
 > end(atom)  
+
 `end` turns off an atom and its descendants. This will allow its data to be garbage collected.    
 For convenience, each atom has a bound `end` method  
 ```js
