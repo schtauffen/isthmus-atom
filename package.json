@@ -1,6 +1,6 @@
 {
   "name": "@isthmus/atom",
-  "version": "1.0.0-rc1",
+  "version": "1.0.0-rc1.1",
   "description": "a minimilistic atom implementation utilizing ramda",
   "main": "lib/index.js",
   "files": [
