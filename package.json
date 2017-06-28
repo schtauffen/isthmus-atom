@@ -8,7 +8,7 @@
     "dist/"
   ],
   "scripts": {
-    "prepublish": "run-s lint test build",
+    "prepublishOnly": "run-s lint test build",
     "lint": "standard",
     "lint:fix": "standard --fix",
     "build": "run-s babel webpack",
