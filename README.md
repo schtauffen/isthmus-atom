@@ -53,8 +53,8 @@ Note that all functions without optional arguments are curried with `R.curry`.
   * [scanMerge](#scanmerge)
   * [end](#end)
   * [log](#log)
-  * [toJSON](#tojson)
-  * [valueOf](#valueof)
+  * [toJSON](#atomtojson)
+  * [valueOf](#atomvalueof)
   * [HALT](#halt)
 
 ### Atom
