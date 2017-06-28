@@ -1,0 +1,25 @@
+{
+  "presets": [
+    ["env", {
+      "targets": {
+        "ie": 11
+      },
+      "modules": false
+    }]
+  ],
+  "plugins": [
+    "ramda",
+    "transform-object-rest-spread"
+  ],
+  "env": {
+    "production": {
+      "ignore": [
+        "*.spec.js",
+        "_*.js"
+      ]
+    },
+    "test": {
+      "plugins": ["transform-es2015-modules-commonjs"]
+    }
+  }
+}
