@@ -2,7 +2,7 @@ const webpack = require('webpack')
 const path = require('path')
 
 module.exports = {
-  entry: './lib/index',
+  entry: './lib/umd',
   context: __dirname,
   output: {
     path: path.resolve(__dirname, 'dist'),
