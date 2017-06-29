@@ -2,18 +2,36 @@
 import R from 'ramda'
 
 export var HALT = '@@isthmus/atom/halt'
-export var isAtom = R.curry(function isAtom (atom) {
+export var TYPES = {
+  ATOM: '@@isthmus/atom',
+  COMPUTED: '@@isthmus/atom/computed',
+  LENSED: '@@isthmus/atom/lensed',
+  ENDED: '@@isthmus/atom/ended'
+}
+
+export var end = R.curry(_end)
+export var isAtom = R.curry(_isAtom)
+export var combine = R.curry(_combine)
+
+function _isAtom (atom) {
   return Boolean(atom && atom.isAtom)
-})
+}
 
-export var log = R.curry(function log (...atoms) {
-  console.log(...atoms.map(function (atom) {
-    return isAtom(atom) ? atom.value : atom
-  }))
-})
+export function log () {
+  var il = arguments.length
+  var result = Array(il)
 
+  for (var i = 0; i < il; ++i) {
+    var item = arguments[i]
+    result[i] = _isAtom(item) ? item.value : item
+  }
+
+  console.log.apply(console, result)
+}
+
+// TODO - !== production ?
 function assertAtom (fn, atom) {
-  if (!isAtom(atom)) {
+  if (!_isAtom(atom)) {
     throw new TypeError(fn + ' expected atom, received ' + atom)
   }
 }
@@ -22,23 +40,17 @@ function assertAtomList (fn, atoms) {
   if (!Array.isArray(atoms)) {
     throw new TypeError(fn + ' expected atom[], received ' + atoms)
   }
-  atoms.forEach(function (a, idx) {
-    assertAtom(fn + ' sources array[' + idx + ']', a)
-  })
-}
-
-export var TYPES = {
-  ATOM: '@@isthmus/atom',
-  COMPUTED: '@@isthmus/atom/computed',
-  LENSED: '@@isthmus/atom/lensed',
-  ENDED: '@@isthmus/atom/ended'
+  for (var i = 0, il = atoms.length; i < il; ++i) {
+    assertAtom(fn + ' sources array[' + i + ']', atoms[i])
+  }
 }
 
 function addToSinkStack (stack, sinks) {
-  sinks.forEach(function (sink) {
+  for (var i = 0, il = sinks.length; i < il; ++i) {
+    var sink = sinks[i]
     if (sink.updateIndex !== null) {
-      for (var i = sink.updateIndex, il = stack.length; i < il; ++i) {
-        stack[i] = stack[i + 1]
+      for (var j = sink.updateIndex, jl = stack.length; j < jl; ++j) {
+        stack[j] = stack[j + 1]
       }
       stack[sink.updateIndex = stack.length - 1] = sink
     } else {
@@ -46,29 +58,15 @@ function addToSinkStack (stack, sinks) {
     }
 
     addToSinkStack(stack, sink.sinks)
-  })
+  }
   return stack
 }
 
 function preventOffspring (sinks) {
-  sinks.forEach(function (sink) {
-    sink.updateIndex = null
-    preventOffspring(sink.sinks)
-  })
-}
-
-function triggerStackUpdates (stack) {
-  stack.forEach(function (atom) {
-    if (atom.updateIndex !== null) {
-      atom.update()
-      if (atom.value === HALT) {
-        preventOffspring(atom.sinks)
-      }
-    }
-  })
-  stack.forEach(function (atom) {
-    atom.updateIndex = null
-  })
+  for (var i = 0, il = sinks.length; i < il; ++i) {
+    sinks[i].updateIndex = null
+    preventOffspring(sinks[i].sinks)
+  }
 }
 
 function updateSinks (value, atom) {
@@ -89,19 +87,37 @@ function updateSinks (value, atom) {
   atom.value = value
 
   const stack = addToSinkStack([], atom.sinks)
-  triggerStackUpdates(stack)
+
+  for (var i = 0, il = stack.length; i < il; ++i) {
+    var item = stack[i]
+    if (item.updateIndex !== null) {
+      item.update()
+      if (item.value === HALT) {
+        preventOffspring(item.sinks)
+      }
+    }
+  }
+
+  for (var j = 0, jl = stack.length; j < jl; ++j) {
+    stack[j].updateIndex = null
+  }
+
   atom.updateIndex = null
 }
 
-export var end = R.curry(function end (atom) {
+function _end (atom) {
   assertAtom('end', atom)
 
-  atom.sources.forEach(function (source) {
+  for (var i = 0, il = atom.sources.length; i < il; ++i) {
+    var source = atom.sources[i]
     var index = source.sinks.indexOf(atom)
     source.sinks.splice(index, 1)
-  })
+  }
 
-  atom.sinks.forEach(end)
+  for (var j = 0, jl = atom.sinks.length; j < jl; ++j) {
+    _end(atom.sinks[j])
+  }
+
   atom.type = TYPES.ENDED
   atom.readonly = true
   atom.value = null
@@ -110,7 +126,16 @@ export var end = R.curry(function end (atom) {
   atom.lens = null
   atom.source = null
   atom.sources = []
-})
+}
+
+function toJSON (atom) {
+  return atom.value != null && typeof atom.value.toJSON === 'function'
+    ? atom.value.toJSON()
+    : atom.value
+}
+function valueOf (atom) {
+  return atom.value
+}
 
 export var Atom = function Atom (value) {
   atom.isAtom = true
@@ -131,11 +156,12 @@ export var Atom = function Atom (value) {
   atom.view = R.flip(view)(atom)
   atom.scan = scan(R.__, R.__, atom)
   atom.modify = R.flip(scan)(atom)
-  atom.end = end.bind(null, atom)
+  atom.end = _end.bind(null, atom)
   atom.log = log.bind(null, atom)
 
-  atom.toJSON = function toJSON () { return atom.value }
-  atom.valueOf = function valueOf () { return atom.value }
+  atom.toJSON = toJSON.bind(null, atom)
+  atom.valueOf = valueOf.bind(null, atom)
+  atom.toString = atom.valueOf
 
   return atom
   function atom () {
@@ -147,7 +173,7 @@ export var Atom = function Atom (value) {
 
 export default Atom
 
-export var combine = R.curry(function combine (compute, sources) {
+function _combine (compute, sources) {
   assertAtomList('combine', sources)
   var atom = Atom()
 
@@ -155,21 +181,33 @@ export var combine = R.curry(function combine (compute, sources) {
   atom.readonly = true
   atom.compute = compute
   atom.sources = sources
-  sources.forEach(function (source) {
-    source.sinks.push(atom)
-  })
+
+  for (var i = 0, il = sources.length; i < il; ++i) {
+    sources[i].sinks.push(atom)
+  }
+
   atom.update = function update () {
-    var values = atom.sources.map(function (s) { return s.value })
+    var jl = atom.sources.length
+    var values = Array(jl)
+    for (var j = 0; j < jl; ++j) {
+      values[j] = atom.sources[j].value
+    }
     atom.value = atom.compute.apply(null, values)
   }
 
-  var values = atom.sources.map(function (s) { return s.value })
-  if (values.indexOf(HALT) < 0) {
-    atom.value = atom.compute.apply(null, values)
+  var kl = atom.sources.length
+  var values = Array(kl)
+  for (var k = 0; k < kl; ++k) {
+    var value = atom.sources[k].value
+    if (value === HALT) {
+      return atom
+    }
+    values[k] = value
   }
 
+  atom.value = atom.compute.apply(null, values)
   return atom
-})
+}
 
 export var view = R.curry(function view (lens, source) {
   assertAtom('view', source)
@@ -206,13 +244,13 @@ export var view = R.curry(function view (lens, source) {
 
 export var map = R.curry(function map (fn, source) {
   assertAtom('map', source)
-  return combine(fn, [source])
+  return _combine(fn, [source])
 })
 
 export var scan = R.curry(function scan (fn, acc, source) {
   assertAtom('scan', source)
 
-  const atom = combine(function (s) {
+  const atom = _combine(function (s) {
     return (acc = fn(acc, s))
   }, [source])
 
@@ -225,7 +263,7 @@ export var scan = R.curry(function scan (fn, acc, source) {
 
 export var merge = R.curry(function merge (source1, source2) {
   assertAtomList('merge', [source1, source2])
-  return combine(function (s1, s2) {
+  return _combine(function (s1, s2) {
     if (source2.updateIndex !== null) {
       return s2
     }
@@ -237,32 +275,37 @@ export var merge = R.curry(function merge (source1, source2) {
 })
 
 export var scanMerge = R.curry(function scanMerge (pairs, seed) {
-  var temp = pairs.reduce(function (out, pair, idx) {
-    out[0][idx] = pair[0]
-    out[1][idx] = pair[1]
-    return out
-  }, [Array(pairs.length), Array(pairs.length)])
-  var fns = temp[0]
-  var sources = temp[1]
+  var len = pairs.length
+  var fns = Array(len)
+  var sources = Array(len)
 
-  var atom = combine(function () {
-    sources.forEach(function (s, idx) {
-      if (s.updateIndex !== null) {
-        seed = fns[idx](seed, s.value)
+  for (var i = 0; i < len; ++i) {
+    fns[i] = pairs[i][0]
+    sources[i] = pairs[i][1]
+  }
+
+  var atom = _combine(function () {
+    for (var j = 0; j < len; ++j) {
+      if (sources[j].updateIndex !== null) {
+        seed = fns[j](seed, sources[j].value)
       }
-    })
+    }
     return seed
   }, sources)
 
-  var values = sources.map(function (s) { return s.value })
-  if (values.indexOf(HALT) < 0) {
-    values.forEach(function (v, idx) {
-      seed = fns[idx](seed, v)
-    })
+  var values = Array(len)
+  var pSeed = seed
+  for (var k = 0; k < len; ++k) {
+    var value = sources[k].value
+    if (value === HALT) {
+      atom.value = seed
+      return atom
+    }
+    values[k] = value
+    pSeed = fns[k](pSeed, value)
   }
 
-  atom.value = seed
-
+  atom.value = pSeed
   return atom
 })
 
