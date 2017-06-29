@@ -1,6 +1,10 @@
 //! @isthmus/atom - Copyright (c) 2017, Zach Dahl; This source code is licensed under the ISC-style license found in the LICENSE file in the root directory of this source tree
 import R from 'ramda'
 
+if (process.env.NODE_ENV !== 'production') {
+  var assert = require('./assert')
+}
+
 export var HALT = '@@isthmus/atom/halt'
 export var TYPES = {
   ATOM: '@@isthmus/atom',
@@ -27,22 +31,6 @@ export function log () {
   }
 
   console.log.apply(console, result)
-}
-
-// TODO - !== production ?
-function assertAtom (fn, atom) {
-  if (!_isAtom(atom)) {
-    throw new TypeError(fn + ' expected atom, received ' + atom)
-  }
-}
-
-function assertAtomList (fn, atoms) {
-  if (!Array.isArray(atoms)) {
-    throw new TypeError(fn + ' expected atom[], received ' + atoms)
-  }
-  for (var i = 0, il = atoms.length; i < il; ++i) {
-    assertAtom(fn + ' sources array[' + i + ']', atoms[i])
-  }
 }
 
 function addToSinkStack (stack, sinks) {
@@ -106,7 +94,9 @@ function updateSinks (value, atom) {
 }
 
 function _end (atom) {
-  assertAtom('end', atom)
+  if (process.env.NODE_ENV !== 'production') {
+    assert.isAtom('end', atom)
+  }
 
   for (var i = 0, il = atom.sources.length; i < il; ++i) {
     var source = atom.sources[i]
@@ -174,7 +164,9 @@ export var Atom = function Atom (value) {
 export default Atom
 
 function _combine (compute, sources) {
-  assertAtomList('combine', sources)
+  if (process.env.NODE_ENV !== 'production') {
+    assert.isAtomList('combine', sources)
+  }
   var atom = Atom()
 
   atom.type = TYPES.COMPUTED
@@ -210,7 +202,9 @@ function _combine (compute, sources) {
 }
 
 export var view = R.curry(function view (lens, source) {
-  assertAtom('view', source)
+  if (process.env.NODE_ENV !== 'production') {
+    assert.isAtom('view', source)
+  }
   var atom = Atom()
 
   atom.type = TYPES.LENSED
@@ -243,12 +237,16 @@ export var view = R.curry(function view (lens, source) {
 })
 
 export var map = R.curry(function map (fn, source) {
-  assertAtom('map', source)
+  if (process.env.NODE_ENV !== 'production') {
+    assert.isAtom('map', source)
+  }
   return _combine(fn, [source])
 })
 
 export var scan = R.curry(function scan (fn, acc, source) {
-  assertAtom('scan', source)
+  if (process.env.NODE_ENV !== 'production') {
+    assert.isAtom('scan', source)
+  }
 
   const atom = _combine(function (s) {
     return (acc = fn(acc, s))
@@ -262,7 +260,9 @@ export var scan = R.curry(function scan (fn, acc, source) {
 })
 
 export var merge = R.curry(function merge (source1, source2) {
-  assertAtomList('merge', [source1, source2])
+  if (process.env.NODE_ENV !== 'production') {
+    assert.isAtomList('merge', [source1, source2])
+  }
   return _combine(function (s1, s2) {
     if (source2.updateIndex !== null) {
       return s2
@@ -310,6 +310,8 @@ export var scanMerge = R.curry(function scanMerge (pairs, seed) {
 })
 
 export var modify = R.curry(function modify (fn, atom) {
-  assertAtom('modify', atom)
+  if (process.env.NODE_ENV !== 'production') {
+    assert.isAtom('modify', atom)
+  }
   return atom(fn(atom.value))
 })
