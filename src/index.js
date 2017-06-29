@@ -142,10 +142,10 @@ export var Atom = function Atom (value) {
   atom.lens = null
   atom.source = null
 
-  atom.map = R.flip(map)(atom)
-  atom.view = R.flip(view)(atom)
+  atom.map = map(R.__, atom)
+  atom.view = view(R.__, atom)
   atom.scan = scan(R.__, R.__, atom)
-  atom.modify = R.flip(scan)(atom)
+  atom.modify = scan(R.__, atom)
   atom.end = _end.bind(null, atom)
   atom.log = log.bind(null, atom)
 
