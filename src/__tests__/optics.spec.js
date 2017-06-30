@@ -3,6 +3,21 @@ import { set, _view } from '../optics'
 import deepFreeze from 'deep-freeze'
 
 describe('set', () => {
+  describe('null or undefined lens', () => {
+    it('should act as an identity lens', () => {
+      const target = { a: 3 }
+      deepFreeze(target)
+      expect(set(null, 3, target)).toBe(3)
+    })
+
+    it('should work inside path', () => {
+      const target = { a: [0, 1] }
+      deepFreeze(target)
+      expect(set(['a', undefined], 'foo', target)).toEqual({ a: 'foo' })
+      expect(set(['a', undefined, 1], 'foo', target)).toEqual({ a: [0, 'foo'] })
+    })
+  })
+
   describe('prop', () => {
     it('should error if given null or undefined', () => {
       expect(() => set('a', 1, null)).toThrow()
@@ -125,8 +140,6 @@ describe('set', () => {
   describe('other values', () => {
     it('should throw error', () => {
       expect(() => set(true, 5, { a: 1 })).toThrow()
-      expect(() => set(null, 5, { a: 1 })).toThrow()
-      expect(() => set(undefined, 5, { a: 1 })).toThrow()
       expect(() => set({ a: 2 }, 5, { a: 1 })).toThrow()
     })
   })

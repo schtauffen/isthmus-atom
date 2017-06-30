@@ -11,6 +11,7 @@ export function _view (lens, target) {
 
 export function setPath (path, value, target) {
   if (path.length === 0) return value
+  if (path[0] == null) return setPath(path.slice(1), value, target)
 
   var result
 
@@ -26,6 +27,8 @@ export function setPath (path, value, target) {
 
 export function set (path, value, target) {
   var result, i, il
+
+  if (path == null) return value
 
   if (typeof path === 'string') {
     var key
