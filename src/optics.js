@@ -1,9 +1,15 @@
-export function _view (lens, target) {
+export function view (lens, target) {
+  if (lens == null) return target
   if (target == null) return undefined
 
   if (Array.isArray(lens)) {
-    if (lens.length === 1) return target[lens[0]]
-    return _view(lens.slice(1), target[lens[0]])
+    var prop = lens[0]
+    if (lens.length === 1) {
+      if (prop == null) return target
+      return target[prop]
+    }
+    if (prop == null) return view(lens.slice(1), target)
+    return view(lens.slice(1), target[prop])
   }
 
   return target[lens]

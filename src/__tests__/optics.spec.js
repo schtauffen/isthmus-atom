@@ -1,5 +1,5 @@
 /* eslint-env jest */
-import { set, _view } from '../optics'
+import { set, view } from '../optics'
 import deepFreeze from 'deep-freeze'
 
 describe('set', () => {
@@ -145,11 +145,31 @@ describe('set', () => {
   })
 })
 
-describe('_view', () => {
+describe('view', () => {
   it('should retrieve appropriate target', () => {
     const target = { a: [0, { b: 7 }] }
     deepFreeze(target)
 
-    expect(_view('a', target)).toEqual([0, { b: 7 }])
+    expect(view('a', target)).toEqual([0, { b: 7 }])
+  })
+
+  it('should return undefined if value not found', () => {
+    const target = { a: [0, { b: 7 }] }
+    deepFreeze(target)
+
+    expect(view('c', target)).toBe(undefined)
+    expect(view(['a', 2], target)).toBe(undefined)
+    expect(view(['a', 2, 4], target)).toBe(undefined)
+    expect(view(0, target)).toBe(undefined)
+  })
+
+  it('should treat null|undefined as identity', () => {
+    const target = { a: [0, { b: 7 }] }
+    deepFreeze(target)
+
+    expect(view(undefined, target)).toEqual(target)
+    expect(view([undefined], target)).toEqual(target)
+    expect(view(['a', undefined], target)).toEqual([0, { b: 7 }])
+    expect(view(['a', undefined, 1], target)).toEqual({ b: 7 })
   })
 })

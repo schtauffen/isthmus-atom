@@ -10,6 +10,7 @@ import Atom, {
   log,
   scan,
   merge,
+  remove,
   scanMerge,
   HALT
 } from '../'
@@ -208,6 +209,14 @@ describe('view', () => {
       expect(atom()).toBe(4)
     })
   })
+
+  describe('bound view', () => {
+    it('should function', () => {
+      const source = Atom({ foo: 'bar' })
+      const lensed = source.view('foo')
+      expect(lensed()).toBe('bar')
+    })
+  })
 })
 
 describe('map', () => {
@@ -254,6 +263,14 @@ describe('map', () => {
     const atom = map(x => x + ' salad', middle)
     expect(atom()).toBe('taco salad')
   })
+
+  describe('bound map', () => {
+    it('should function', () => {
+      const source = Atom(7)
+      const mapped = source.map(R.multiply(2))
+      expect(mapped()).toBe(14)
+    })
+  })
 })
 
 describe('modify', () => {
@@ -284,6 +301,14 @@ describe('modify', () => {
     const source = Atom(2)
     const atom = map(x => x * x, source)
     expect(() => modify(x => x + 1, atom)).toThrow()
+  })
+
+  describe('bound modify', () => {
+    it('should function', () => {
+      const source = Atom(3)
+      source.modify(R.add(4))
+      expect(source()).toBe(7)
+    })
   })
 })
 
@@ -330,14 +355,24 @@ describe('end', () => {
 
   it('should work for chained lenses', () => {
     const source = Atom({ a: 1 })
-    const second = view(R.identity, source)
-    const third = view(R.identity, second)
+    const second = view(undefined, source)
+    const third = view(undefined, second)
     const atom = view('a', third)
     end(third)
     expect(third.type).toBe('@@isthmus/atom/ended')
     expect(atom.type).toBe('@@isthmus/atom/ended')
     expect(source.sinks.indexOf(third)).toBe(-1)
     expect(source.sinks.indexOf(atom)).toBe(-1)
+  })
+
+  describe('bound end', () => {
+    it('should function', () => {
+      const source = Atom({ a: 1 })
+      const second = source.view('a')
+      source.end()
+      expect(source.type).toBe('@@isthmus/atom/ended')
+      expect(second.type).toBe('@@isthmus/atom/ended')
+    })
   })
 })
 
@@ -381,6 +416,15 @@ describe('scan', () => {
     expect(scanned()).toBe(6)
     source(4)
     expect(scanned()).toBe(10)
+  })
+
+  describe('bound scan', () => {
+    it('should function', () => {
+      const source = Atom(0)
+      const scanned = source.scan(R.add, 0)
+      source(1)(2)(3)(4)
+      expect(scanned()).toBe(10)
+    })
   })
 })
 
@@ -465,6 +509,13 @@ describe('log', () => {
     it('should work for more than 1 argument', () => {
       log(1, Atom(2), 3)
       expect(stub.calledWith(1, 2, 3)).toBe(true)
+    })
+  })
+
+  describe('bound log', () => {
+    it('should work', () => {
+      Atom(7).log()
+      expect(stub.calledWith(7)).toBe(true)
     })
   })
 })
@@ -573,5 +624,25 @@ describe('HALT', () => {
     expect(ac()).toBe(10)
 
     sandbox.restore()
+  })
+})
+
+describe('remove', () => {
+  it('should set atom to undefined', () => {
+    const source = Atom({ a: 7 })
+    remove(source)
+    expect(source()).toBe(undefined)
+  })
+
+  it('should remove items from parent', () => {
+    const source = Atom({ foo: [0, 1], bar: 'biz' })
+
+    const fooHead = source.view(['foo', 0])
+    fooHead.remove()
+    expect(source()).toEqual({ foo: [1], bar: 'biz' })
+
+    const bar = source.view('bar')
+    bar.remove()
+    expect(source()).toEqual({ foo: [1] })
   })
 })
