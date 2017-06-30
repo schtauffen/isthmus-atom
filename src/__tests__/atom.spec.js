@@ -1,6 +1,7 @@
 /* eslint-env jest */
 import R from 'ramda'
 import Atom, {
+  set,
   combine,
   end,
   isAtom,
@@ -13,7 +14,150 @@ import Atom, {
   scanMerge,
   HALT
 } from '../'
+import deepFreeze from 'deep-freeze'
 import sinon from 'sinon'
+
+describe('set', () => {
+  describe('prop', () => {
+    it('should error if given null or undefined', () => {
+      expect(() => set('a', 1, null)).toThrow()
+      expect(() => set('foo', 'bar', undefined)).toThrow()
+
+      expect(() => set(0, 1, null)).toThrow()
+      expect(() => set(2, 'bar', undefined)).toThrow()
+    })
+
+    it('should set prop on target when given string', () => {
+      const target = { a: 1, b: 2 }
+      deepFreeze(target)
+      expect(set('c', 3, target)).toEqual({ a: 1, b: 2, c: 3 })
+    })
+
+    it('should override prop if it already exists', () => {
+      const target = { a: 1, b: 2 }
+      deepFreeze(target)
+      expect(set('b', 7, target)).toEqual({ a: 1, b: 7 })
+    })
+
+    it('should be curried', () => {
+      const target = { a: 1, b: 2 }
+      deepFreeze(target)
+      expect(set('a', 'foo')(target)).toEqual({ a: 'foo', b: 2 })
+    })
+
+    it('should make into object', () => {
+      expect(set('a', 7, [])).toEqual({ a: 7 })
+    })
+
+    describe('remove', () => {
+      it('should remove a prop if given value is undefined', () => {
+        const target = { a: 1, b: 2, c: 3 }
+        deepFreeze(target)
+        expect(set('b', undefined, target)).toEqual({ a: 1, c: 3 })
+      })
+
+      it('should do nothing if given value is undefined', () => {
+        const target = { a: 'foo', b: 'bar' }
+        deepFreeze(target)
+        expect(set('c', undefined, target)).toBe(target)
+      })
+    })
+  })
+
+  describe('index', () => {
+    it('should set index on target when given number', () => {
+      const target = [0, 1, 2]
+      deepFreeze(target)
+      expect(set(1, 'foo', target)).toEqual([0, 'foo', 2])
+    })
+
+    it('should allow negatives as "from end"', () => {
+      const target = [0, 1, 2]
+      deepFreeze(target)
+      expect(set(-3, 'foo', target)).toEqual(['foo', 1, 2])
+    })
+
+    it('should do nothing if index isn\'t in range', () => {
+      const target = [0, 1, 2]
+      deepFreeze(target)
+      expect(set(3, 'foo', target)).toBe(target)
+      expect(set(-4, 'foo', target)).toBe(target)
+    })
+
+    it('should be curried', () => {
+      const target = [0, 1, 2]
+      deepFreeze(target)
+      expect(set(1)('foo')(target)).toEqual([0, 'foo', 2])
+    })
+
+    it('should make into array', () => {
+      expect(set(1, 7, {})).toEqual([undefined, 7])
+    })
+
+    describe('remove', () => {
+      it('should remove index from target when given value is undefined', () => {
+        const target = [0, 'foo', 2]
+        deepFreeze(target)
+        expect(set(1, undefined, target)).toEqual([0, 2])
+      })
+
+      it('should allow negatives as "from end"', () => {
+        const target = [0, 'foo', 2]
+        deepFreeze(target)
+        expect(set(-1, undefined, target)).toEqual([0, 'foo'])
+      })
+
+      it('should do nothing if index isn\'t in range', () => {
+        const target = [0, 'foo', 2]
+        deepFreeze(target)
+        expect(set(-4, undefined, target)).toBe(target)
+        expect(set(3, undefined, target)).toBe(target)
+      })
+    })
+  })
+
+  describe('array', () => {
+    it('should change value at path if it already exists', () => {
+      const target = { a: [0, { b: 'foo', c: 'bar' }] }
+      deepFreeze(target)
+
+      const result = set(['a', 1, 'c'], 'biz', target)
+      expect(result).toEqual({ a: [0, { b: 'foo', c: 'biz' }] })
+    })
+
+    it('should autovivify objects', () => {
+      expect(set(['a', 1, 'b'], 7, null)).toEqual({ a: [undefined, { b: 7 }] })
+
+      const target = { a: { b: null } }
+      deepFreeze(target)
+      expect(set(['a', 'b', 'c'], 7, { a: { b: null } }))
+        .toEqual({ a: { b: { c: 7 } } })
+    })
+
+    it('should remove if supplied value is undefined and it exists', () => {
+      const target = { a: [0, { b: 7 }] }
+      deepFreeze(target)
+      expect(set(['a', 1, 'b'], undefined, target)).toEqual({ a: [0, {}] })
+      expect(set(['a', -1], undefined, target)).toEqual({ a: [0] })
+    })
+
+    it('should do nothing if value undefined and does not exist', () => {
+      const target = { a: [0, { c: 7 }] }
+      deepFreeze(target)
+      expect(set(['a', 1, 'b'], undefined, target)).toEqual(target)
+      expect(set(['a', 2], undefined, target)).toEqual(target)
+    })
+  })
+
+  describe('other values', () => {
+    it('should throw error', () => {
+      expect(() => set(true, 5, { a: 1 })).toThrow()
+      expect(() => set(null, 5, { a: 1 })).toThrow()
+      expect(() => set(undefined, 5, { a: 1 })).toThrow()
+      expect(() => set({ a: 2 }, 5, { a: 1 })).toThrow()
+    })
+  })
+})
 
 describe('Atom', () => {
   describe('returned atom', () => {
@@ -99,35 +243,35 @@ describe('combine', () => {
 
 describe('view', () => {
   it('should throw if not given atom', () => {
-    expect(() => view(R.lensProp(0), 123)).toThrow()
-    expect(() => view(R.lensProp(0), '123')).toThrow()
-    expect(() => view(R.lensProp(0), [7])).toThrow()
-    expect(() => view(R.lensProp(0), { foo: 'bar' })).toThrow()
+    expect(() => view(0, 123)).toThrow()
+    expect(() => view(0, '123')).toThrow()
+    expect(() => view(0, [7])).toThrow()
+    expect(() => view(0, { foo: 'bar' })).toThrow()
   })
 
   describe('returned atom', () => {
     it('should have type @isthmus/atom/lensed', () => {
       const source = Atom({ a: 7 })
-      const atom = view(R.lensProp('a'), source)
+      const atom = view('a', source)
       expect(atom.type).toBe('@@isthmus/atom/lensed')
     })
 
     it('should initialize immediately', () => {
       const source = Atom({ a: 7 })
-      const atom = view(R.lensProp('a'), source)
+      const atom = view('a', source)
       expect(atom()).toBe(7)
     })
 
     it('should update when source does', () => {
       const source = Atom({ a: 7 })
-      const atom = view(R.lensProp('a'), source)
+      const atom = view('a', source)
       source({ a: 52 })
       expect(atom()).toBe(52)
     })
 
     it('should be set-able', () => {
       const source = Atom({ a: 7 })
-      const atom = view(R.lensProp('a'), source)
+      const atom = view('a', source)
       atom(12)
       expect(atom()).toBe(12)
       expect(source()).toEqual({ a: 12 })
@@ -159,7 +303,7 @@ describe('view', () => {
     it('should initialize correctly', () => {
       const source = Atom(3)
       const computed = combine(x => ({ x }), [source])
-      const atom = view(R.lensProp('x'), computed)
+      const atom = view('x', computed)
       expect(computed()).toEqual({ x: 3 })
       expect(atom()).toBe(3)
     })
@@ -167,14 +311,14 @@ describe('view', () => {
     it('should be readonly', () => {
       const source = Atom(3)
       const computed = combine(x => ({ x }), [source])
-      const atom = view(R.lensProp('x'), computed)
+      const atom = view('x', computed)
       expect(() => atom(7)).toThrow()
     })
 
     it('should update when its source does', () => {
       const source = Atom(3)
       const computed = combine(x => ({ x }), [source])
-      const atom = view(R.lensProp('x'), computed)
+      const atom = view('x', computed)
       source(4)
       expect(computed()).toEqual({ x: 4 })
       expect(atom()).toBe(4)
@@ -184,15 +328,15 @@ describe('view', () => {
   describe('lensing a (non-readonly) lensed atom', () => {
     it('should compose lens', () => {
       const source = Atom({ foo: [3, 6, 9] })
-      const middle = view(R.lensProp('foo'), source)
-      const atom = view(R.lensIndex(2), middle)
+      const middle = view('foo', source)
+      const atom = view(2, middle)
       expect(atom()).toBe(9)
     })
 
     it('should set all the way to source', () => {
       const source = Atom({ foo: [3, 6, 9] })
-      const middle = view(R.lensProp('foo'), source)
-      const atom = view(R.lensIndex(2), middle)
+      const middle = view('foo', source)
+      const atom = view(2, middle)
       atom(7)
       expect(atom()).toBe(7)
       expect(middle()).toEqual([3, 6, 7])
@@ -201,7 +345,7 @@ describe('view', () => {
 
     it('should work for computed', () => {
       const source = Atom({ foo: 7 })
-      const lensed = view(R.lensProp('foo'), source)
+      const lensed = view('foo', source)
       const atom = map(x => 2 * x, lensed)
       expect(atom()).toBe(14)
       lensed(2)
@@ -243,7 +387,7 @@ describe('map', () => {
 
   it('should work on lensed', () => {
     const source = Atom({ foo: 'ta' })
-    const middle = view(R.lensProp('foo'), source)
+    const middle = view('foo', source)
     const atom = map(x => x + 'co', middle)
     expect(atom()).toBe('taco')
   })
@@ -275,7 +419,7 @@ describe('modify', () => {
 
   it('should work on lensed', () => {
     const source = Atom({ foo: 3 })
-    const atom = view(R.lensProp('foo'), source)
+    const atom = view('foo', source)
     modify(x => x + 2, atom)
     expect(source()).toEqual({ foo: 5 })
   })
@@ -311,7 +455,7 @@ describe('end', () => {
   it('should remove from ancestor\'s sinks', () => {
     const source = Atom(4)
     const middle = map(s => [s], source)
-    const atom = view(R.lensIndex(0), middle)
+    const atom = view(0, middle)
     end(atom)
     expect(middle.sinks.indexOf(atom)).toBe(-1)
     expect(source.sinks.indexOf(atom)).toBe(-1)
@@ -320,7 +464,7 @@ describe('end', () => {
   it('should end downstream atoms', () => {
     const source = Atom(4)
     const middle = map(s => [s], source)
-    const atom = view(R.lensIndex(0), middle)
+    const atom = view(0, middle)
     end(middle)
     expect(middle.type).toBe('@@isthmus/atom/ended')
     expect(atom.type).toBe('@@isthmus/atom/ended')
@@ -332,7 +476,7 @@ describe('end', () => {
     const source = Atom({ a: 1 })
     const second = view(R.identity, source)
     const third = view(R.identity, second)
-    const atom = view(R.lensProp('a'), third)
+    const atom = view('a', third)
     end(third)
     expect(third.type).toBe('@@isthmus/atom/ended')
     expect(atom.type).toBe('@@isthmus/atom/ended')
@@ -348,7 +492,7 @@ describe('isAtom', () => {
 
   it('should return tree for atoms', () => {
     const atom = Atom({ a: 7 })
-    const lensed = view(R.lensProp('a'), atom)
+    const lensed = view('a', atom)
     const computed = map(x => ({ ...x, b: 9 }), atom)
     expect(isAtom(atom)).toBe(true)
     expect(isAtom(lensed)).toBe(true)
