@@ -15,10 +15,10 @@ computed atom:
 ## Why @isthmus/atom?
 This library intends to focus on being a powerful tool, while maintaing a small footprint and staying approachable. If you would like to use streams/atoms but fear about bloat then this may be a good choice for you.   
 
-The UMD build (as of 6/29/2017) clocks in at 2.5kB gzipped:
+The UMD build (as of 6/30/2017) clocks in at 2.4kB gzipped:
 ```bash
 > gzip -c dist/atom.js | wc -c
-2510
+2411
 ```
 
 ## Installation
@@ -109,7 +109,7 @@ const doubled = n.map(R.multiply(2)) // 6
 ### view
 > view(lens, atom) --> lensed atom  
 
-`view` returns a lensed atom. It can receive a string, number or array of the two which will be used as a path.  
+`view` returns a lensed atom. It can receive a string, number or array of the two which will be used as a path.   
 ```js
 const source = Atom({ foo: [1, 2, 3] })
 const lensed = view(['foo', 1], source) // 2
@@ -122,6 +122,15 @@ for convenience, each atom has a `view` method bound to it:
 ```js
 const atom = Atom(['a', 'b', 'c'])
 const head = atom.view(0) // 'a'
+```
+`undefined` or `null` as a lens, or in a lens path, will be treated like an identity lens. This can be useful for making separate trees that may be ended simultaneously.  
+```js
+const source = Atom({ foo: [1, 2, 3] })
+const lensed = source.view('foo')
+const proxy = source.view(null)
+const proxiedLensed = proxy.view('foo')
+
+proxy.end() // proxiedLensed is ended, lensed is still alive
 ```
 
 ### isAtom
