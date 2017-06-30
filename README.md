@@ -49,6 +49,7 @@ Note that all functions without optional arguments are curried with `crry`.
   * [combine](#combine)
   * [map](#map)
   * [view](#view)
+  * [remove](#review)
   * [isAtom](#isatom)
   * [modify](#modify)
   * [scan](#scan)
@@ -118,11 +119,6 @@ lensed(7) // 7; source: { foo: [1, 7, 3] }
 const mapped = map(R.identity, source)
 const readonly = view(['foo', 1], mapped) // 2; is readonly so readonly(7) -> Error
 ```
-for convenience, each atom has a `view` method bound to it:
-```js
-const atom = Atom(['a', 'b', 'c'])
-const head = atom.view(0) // 'a'
-```
 `undefined` or `null` as a lens, or in a lens path, will be treated like an identity lens. This can be useful for making separate trees that may be ended simultaneously.  
 ```js
 const source = Atom({ foo: [1, 2, 3] })
@@ -131,6 +127,27 @@ const proxy = source.view(null)
 const proxiedLensed = proxy.view('foo')
 
 proxy.end() // proxiedLensed is ended, lensed is still alive
+```
+for convenience, each atom has a `view` method bound to it:
+```js
+const atom = Atom(['a', 'b', 'c'])
+const head = atom.view(0) // 'a'
+```
+
+### remove
+> remove(atom) -> atom  
+
+`remove` sets an atom to `undefined`, and returns the atom. If passed to a lensed atom, this means removing the property/array item from its source.
+```js
+const atom = Atom({ a: 0, b: 0, c: 7 })
+const b = atom.view('b')
+remove(b) // undefined, atom: { a: 0, c: 7 }
+```
+for convenience, each atom has a `remove` method bound to it:
+```js
+const atom = Atom(['a', 'b', 'c'])
+const head = atom.view(0) // 'a'
+head.remove() // undefined, atom: ['b', 'c']
 ```
 
 ### isAtom
