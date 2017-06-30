@@ -1,11 +1,12 @@
 //! @isthmus/atom - Copyright (c) 2017, Zach Dahl; This source code is licensed under the ISC-style license found in the LICENSE file in the root directory of this source tree
-import R from 'ramda'
+import { __, curry, curryN } from 'crry'
 import { set, _view } from './optics'
 
 if (process.env.NODE_ENV !== 'production') {
   var assert = require('./assert')
 }
 
+export { __, curry, curryN }
 export var HALT = '@@isthmus/atom/halt'
 export var TYPES = {
   ATOM: '@@isthmus/atom',
@@ -14,9 +15,9 @@ export var TYPES = {
   ENDED: '@@isthmus/atom/ended'
 }
 
-export var end = R.curry(_end)
-export var isAtom = R.curry(_isAtom)
-export var combine = R.curry(_combine)
+export var end = curry(_end)
+export var isAtom = curry(_isAtom)
+export var combine = curry(_combine)
 
 function _isAtom (atom) {
   return Boolean(atom && atom.isAtom)
@@ -143,10 +144,10 @@ export var Atom = function Atom (value) {
   atom.lens = null
   atom.source = null
 
-  atom.map = map(R.__, atom)
-  atom.view = view(R.__, atom)
-  atom.scan = scan(R.__, R.__, atom)
-  atom.modify = scan(R.__, atom)
+  atom.map = map(__, atom)
+  atom.view = view(__, atom)
+  atom.scan = scan(__, __, atom)
+  atom.modify = scan(__, atom)
   atom.end = _end.bind(null, atom)
   atom.log = log.bind(null, atom)
 
@@ -202,7 +203,7 @@ function _combine (compute, sources) {
   return atom
 }
 
-export var view = R.curry(function view (lens, source) {
+export var view = curry(function view (lens, source) {
   if (process.env.NODE_ENV !== 'production') {
     assert.isAtom('view', source)
   }
@@ -231,14 +232,14 @@ export var view = R.curry(function view (lens, source) {
   return atom
 })
 
-export var map = R.curry(function map (fn, source) {
+export var map = curry(function map (fn, source) {
   if (process.env.NODE_ENV !== 'production') {
     assert.isAtom('map', source)
   }
   return _combine(fn, [source])
 })
 
-export var scan = R.curry(function scan (fn, acc, source) {
+export var scan = curry(function scan (fn, acc, source) {
   if (process.env.NODE_ENV !== 'production') {
     assert.isAtom('scan', source)
   }
@@ -254,7 +255,7 @@ export var scan = R.curry(function scan (fn, acc, source) {
   return atom
 })
 
-export var merge = R.curry(function merge (source1, source2) {
+export var merge = curry(function merge (source1, source2) {
   if (process.env.NODE_ENV !== 'production') {
     assert.isAtomList('merge', [source1, source2])
   }
@@ -269,7 +270,7 @@ export var merge = R.curry(function merge (source1, source2) {
   }, [source1, source2])
 })
 
-export var scanMerge = R.curry(function scanMerge (pairs, seed) {
+export var scanMerge = curry(function scanMerge (pairs, seed) {
   var len = pairs.length
   var fns = Array(len)
   var sources = Array(len)
@@ -304,7 +305,7 @@ export var scanMerge = R.curry(function scanMerge (pairs, seed) {
   return atom
 })
 
-export var modify = R.curry(function modify (fn, atom) {
+export var modify = curry(function modify (fn, atom) {
   if (process.env.NODE_ENV !== 'production') {
     assert.isAtom('modify', atom)
   }

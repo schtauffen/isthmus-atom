@@ -1,28 +1,33 @@
 {
   "name": "@isthmus/atom",
-  "version": "1.0.0-rc2",
-  "description": "A minimalist atom implementation utilizing Ramda",
-  "main": "lib/index.js",
+  "version": "1.0.0-rc3",
+  "description": "A minimalist atom implementation",
+  "main": "cjs/index.js",
+  "module": "lib/index.js",
   "files": [
     "lib/",
+    "cjs/",
     "dist/"
   ],
   "scripts": {
-    "prepublishOnly": "run-s lint test build",
+    "prepublishOnly": "npm run build",
     "lint": "standard",
     "lint:fix": "standard --fix",
-    "build": "run-s babel webpack",
+    "build": "run-s babel cjs webpack",
     "babel": "cross-env NODE_ENV=production babel -d ./lib ./src -s",
+    "cjs": "cross-env BABEL_ENV=node cross-env NODE_ENV=production babel -d ./cjs ./src -s",
     "webpack": "cross-env NODE_ENV=production webpack -p --display-optimization-bailout",
-    "test": "jest --coverage",
+    "test": "run-s lint test:unit",
+    "test:unit": "jest --coverage",
     "test:watch": "jest --coverage --watch"
   },
-  "author": "z.schtauffen@gmail.com",
+  "author": "Zach Dahl <z.schtauffen@gmail.com>",
   "license": "ISC",
   "repository": "schtauffen/isthmus-atom",
   "standard": {
     "ignore": [
       "lib/",
+      "cjs/",
       "**/__tests__/"
     ]
   },
@@ -36,7 +41,6 @@
   },
   "devDependencies": {
     "babel-core": "^6.25.0",
-    "babel-plugin-ramda": "^1.2.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.23.0",
     "babel-preset-env": "^1.5.2",
@@ -46,9 +50,10 @@
     "npm-run-all": "^4.0.2",
     "sinon": "^2.3.5",
     "standard": "^10.0.2",
+    "ramda": "^0.24.1",
     "webpack": "^3.0.0"
   },
   "dependencies": {
-    "ramda": "^0.24.1"
+    "crry": "^1.1.0"
   }
 }

@@ -15,10 +15,10 @@ computed atom:
 ## Why @isthmus/atom?
 This library intends to focus on being a powerful tool, while maintaing a small footprint and staying approachable. If you would like to use streams/atoms but fear about bloat then this may be a good choice for you.   
 
-The UMD build (as of 6/28/2017) clocks in just over 4kB gzipped:
+The UMD build (as of 6/29/2017) clocks in at 2.5kB gzipped:
 ```bash
 > gzip -c dist/atom.js | wc -c
-4301
+2510
 ```
 
 ## Installation
@@ -279,4 +279,4 @@ atom.end()
 ```
 
 ## Acknowledgements
-_@isthmus/atom_ draws inspiration from [mithril streams](https://github.com/MithrilJS/mithril.js/blob/master/docs/stream.md), [flyd](https://github.com/paldepind/flyd) and [calmm-js](https://github.com/calmm-js/documentation/blob/master/introduction-to-calmm.md). It utilizes [ramda](https://github.com/ramda/ramda) as its only dependency.
+_@isthmus/atom_ draws inspiration from [mithril streams](https://github.com/MithrilJS/mithril.js/blob/master/docs/stream.md), [flyd](https://github.com/paldepind/flyd) and [calmm-js](https://github.com/calmm-js/documentation/blob/master/introduction-to-calmm.md). It utilizes [crry](https://github.com/schtauffen/crry) as its only dependency.

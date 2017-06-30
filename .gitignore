@@ -3,4 +3,5 @@ coverage
 *.log
 build
 lib
+cjs
 dist
