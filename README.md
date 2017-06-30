@@ -44,8 +44,7 @@ There is a umd version available under `@isthmus/atom/dist/atom.js`:
 ```
 
 ## API
-Note that all functions without optional arguments are curried with `R.curry`.
-
+Note that all functions without optional arguments are curried with `crry`. 
   * [Atom](#atom)
   * [combine](#combine)
   * [map](#map)
@@ -110,10 +109,10 @@ const doubled = n.map(R.multiply(2)) // 6
 ### view
 > view(lens, atom) --> lensed atom  
 
-`view` returns a lensed atom. It can receive a string, number or array of the two which will be passed onto `R.lensProp`, `R.lensIndex` and `R.lensPath`, resp.  
+`view` returns a lensed atom. It can receive a string, number or array of the two which will be used as a path.  
 ```js
 const source = Atom({ foo: [1, 2, 3] })
-const lensed = view(['foo', 1], source) // 2; is equivelant to: view(R.lensPath(['foo', 1]), source)
+const lensed = view(['foo', 1], source) // 2
 lensed(7) // 7; source: { foo: [1, 7, 3] }
 
 const mapped = map(R.identity, source)
