@@ -49,7 +49,7 @@ Note that all functions without optional arguments are curried with `crry`.
   * [combine](#combine)
   * [map](#map)
   * [view](#view)
-  * [remove](#review)
+  * [remove](#remove)
   * [isAtom](#isatom)
   * [modify](#modify)
   * [scan](#scan)
