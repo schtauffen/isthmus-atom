@@ -13,7 +13,7 @@
     "prepublishOnly": "npm run build",
     "lint": "standard",
     "lint:fix": "standard --fix",
-    "build": "run-s babel cjs webpack",
+    "build": "run-s test babel cjs webpack",
     "babel": "cross-env NODE_ENV=production babel -d ./lib ./src -s",
     "cjs": "cross-env BABEL_ENV=node cross-env NODE_ENV=production babel -d ./cjs ./src -s",
     "webpack": "cross-env NODE_ENV=production webpack -p --display-optimization-bailout",
