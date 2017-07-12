@@ -18,7 +18,7 @@ This library intends to focus on being a powerful tool, while maintaing a small 
 The UMD build (as of 6/30/2017) clocks in at 2.5kB gzipped:
 ```bash
 > gzip -c dist/atom.js | wc -c
-2532
+2524
 ```
 
 ## Installation

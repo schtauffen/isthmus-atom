@@ -77,6 +77,8 @@ function preventOffspring (sinks) {
 }
 
 function updateSinks (value, atom) {
+  var i, il
+
   if (atom.readonly) {
     throw new Error('Cannot manually set readonly atom')
   }
@@ -95,7 +97,7 @@ function updateSinks (value, atom) {
 
   const stack = addToSinkStack([], atom.sinks)
 
-  for (var i = 0, il = stack.length; i < il; ++i) {
+  for (i = 0, il = stack.length; i < il; ++i) {
     var item = stack[i]
     if (item.updateIndex !== null) {
       item.update()
@@ -105,8 +107,8 @@ function updateSinks (value, atom) {
     }
   }
 
-  for (var j = 0, jl = stack.length; j < jl; ++j) {
-    stack[j].updateIndex = null
+  for (i = 0, il = stack.length; i < il; ++i) {
+    stack[i].updateIndex = null
   }
 
   atom.updateIndex = null
@@ -192,6 +194,7 @@ function _combine (compute, sources) {
   if (process.env.NODE_ENV !== 'production') {
     assert.isAtomList('combine', sources)
   }
+
   var atom = Atom()
 
   atom.type = TYPES.COMPUTED
