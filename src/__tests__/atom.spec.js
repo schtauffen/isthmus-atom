@@ -12,6 +12,7 @@ import Atom, {
   merge,
   remove,
   scanMerge,
+  set,
   HALT
 } from '../'
 import sinon from 'sinon'
@@ -644,5 +645,49 @@ describe('remove', () => {
     const bar = source.view('bar')
     bar.remove()
     expect(source()).toEqual({ foo: [1] })
+  })
+})
+
+describe('set', () => {
+  it('should set atom by lens', () => {
+    const source = Atom({ a: [] })
+    const lensed = source.view('a')
+    const mapped = lensed.map(x => x.concat(2))
+
+    expect(set('a', [0, 1], source)).toBe(source)
+    expect(source()).toEqual({ a: [0, 1] })
+    expect(lensed()).toEqual([0, 1])
+    expect(mapped()).toEqual([0, 1, 2])
+
+    expect(set(1, 7, lensed)).toBe(lensed)
+    expect(source()).toEqual({ a: [0, 7] })
+    expect(lensed()).toEqual([0, 7])
+    expect(mapped()).toEqual([0, 7, 2])
+
+    expect(() => set(2, 9, mapped)).toThrow()
+
+    expect(set(['a', 1], 11, source)()).toEqual({ a: [0, 11] })
+  })
+
+  describe('bound set', () => {
+    it('should function', () => {
+      const source = Atom({ a: [] })
+      const lensed = source.view('a')
+      const mapped = lensed.map(x => x.concat(2))
+
+      source.set('a', [0, 1])
+      expect(source()).toEqual({ a: [0, 1] })
+      expect(lensed()).toEqual([0, 1])
+      expect(mapped()).toEqual([0, 1, 2])
+
+      lensed.set(1, 7)
+      expect(source()).toEqual({ a: [0, 7] })
+      expect(lensed()).toEqual([0, 7])
+      expect(mapped()).toEqual([0, 7, 2])
+
+      expect(() => mapped.set(2, 9)).toThrow()
+
+      expect(source.set(['a', 1], 11)()).toEqual({ a: [0, 11] })
+    })
   })
 })

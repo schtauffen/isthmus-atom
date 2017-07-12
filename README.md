@@ -49,6 +49,7 @@ Note that all functions without optional arguments are curried with `crry`.
   * [combine](#combine)
   * [map](#map)
   * [view](#view)
+  * [set](#set)
   * [remove](#remove)
   * [isAtom](#isatom)
   * [modify](#modify)
@@ -132,6 +133,21 @@ for convenience, each atom has a `view` method bound to it:
 ```js
 const atom = Atom(['a', 'b', 'c'])
 const head = atom.view(0) // 'a'
+```
+
+### set
+> set(lens, value, atom) --> atom  
+
+`set` allows you to change an atom's value by supplied lens. It returns the effected atom.
+```js
+const source = Atom({ foo: [1, 2, 3] })
+const lensed = source.view('foo')
+
+set(['foo', 1], 7, source) // { foo: [1, 7, 3] }
+```
+for convenience, each atom has a `set` method bound to it:
+```js
+source.set(['foo', 2], 11) // { foo: [1, 7, 11] }
 ```
 
 ### remove

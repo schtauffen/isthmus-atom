@@ -1,4 +1,9 @@
-export function view (lens, target) {
+import { curry } from 'crry'
+
+export const view = curry(_view)
+export const set = curry(_set)
+
+export function _view (lens, target) {
   if (lens == null) return target
   if (target == null) return undefined
 
@@ -8,14 +13,14 @@ export function view (lens, target) {
       if (prop == null) return target
       return target[prop]
     }
-    if (prop == null) return view(lens.slice(1), target)
-    return view(lens.slice(1), target[prop])
+    if (prop == null) return _view(lens.slice(1), target)
+    return _view(lens.slice(1), target[prop])
   }
 
   return target[lens]
 }
 
-export function setPath (path, value, target) {
+function setPath (path, value, target) {
   if (path.length === 0) return value
   if (path[0] == null) return setPath(path.slice(1), value, target)
 
@@ -28,10 +33,10 @@ export function setPath (path, value, target) {
     return result
   }
 
-  return set(path[0], setPath(path.slice(1), value, target[path[0]]), target)
+  return _set(path[0], setPath(path.slice(1), value, target[path[0]]), target)
 }
 
-export function set (path, value, target) {
+export function _set (path, value, target) {
   var result, i, il
 
   if (path == null) return value
