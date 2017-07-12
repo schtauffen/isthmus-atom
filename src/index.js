@@ -1,6 +1,14 @@
 // @isthmus/atom - Copyright (c) 2017, Zach Dahl; This source code is licensed under the ISC-style license found in the LICENSE file in the root directory of this source tree
-import { __, curry, curryN } from 'crry'
-import { set as _set, view as _view } from './optics'
+import {
+  __,
+  curry,
+  curryN
+} from 'crry'
+import {
+  set as _set,
+  view as _view,
+  over as _over
+} from './optics'
 
 if (process.env.NODE_ENV !== 'production') {
   var assert = require('./assert')
@@ -22,6 +30,10 @@ export var remove = curry(_remove)
 
 export var set = curry(function set (lens, value, atom) {
   return atom(_set(lens, value, atom.value))
+})
+
+export var over = curry(function over (lens, visitor, atom) {
+  return atom(_over(lens, visitor, atom.value))
 })
 
 function _isAtom (atom) {
@@ -160,6 +172,7 @@ export var Atom = function Atom (value) {
   atom.remove = _remove.bind(null, atom)
   atom.log = log.bind(null, atom)
   atom.set = set(__, __, atom)
+  atom.over = over(__, __, atom)
 
   atom.toJSON = toJSON.bind(null, atom)
   atom.valueOf = valueOf.bind(null, atom)

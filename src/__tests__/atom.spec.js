@@ -13,6 +13,7 @@ import Atom, {
   remove,
   scanMerge,
   set,
+  over,
   HALT
 } from '../'
 import sinon from 'sinon'
@@ -688,6 +689,50 @@ describe('set', () => {
       expect(() => mapped.set(2, 9)).toThrow()
 
       expect(source.set(['a', 1], 11)()).toEqual({ a: [0, 11] })
+    })
+  })
+})
+
+describe('over', () => {
+  it('should modify atom at lens by function', () => {
+    const source = Atom({ a: [] })
+    const lensed = source.view('a')
+    const mapped = lensed.map(x => x.concat(2))
+
+    expect(over('a', a => a.concat(1), source)).toBe(source)
+    expect(source()).toEqual({ a: [1] })
+    expect(lensed()).toEqual([1])
+    expect(mapped()).toEqual([1, 2])
+
+    expect(over(0, x => x + 3, lensed)).toBe(lensed)
+    expect(source()).toEqual({ a: [4] })
+    expect(lensed()).toEqual([4])
+    expect(mapped()).toEqual([4, 2])
+
+    expect(() => over(1, x => x * 3, mapped)).toThrow()
+
+    expect(over(['a', 0], x => x - 5, source)()).toEqual({ a: [-1] })
+  })
+
+  describe('bound over', () => {
+    it('should function', () => {
+      const source = Atom({ a: [] })
+      const lensed = source.view('a')
+      const mapped = lensed.map(x => x.concat(2))
+
+      expect(source.over('a', a => a.concat(1))).toBe(source)
+      expect(source()).toEqual({ a: [1] })
+      expect(lensed()).toEqual([1])
+      expect(mapped()).toEqual([1, 2])
+
+      expect(lensed.over(0, x => x + 3)).toBe(lensed)
+      expect(source()).toEqual({ a: [4] })
+      expect(lensed()).toEqual([4])
+      expect(mapped()).toEqual([4, 2])
+
+      expect(() => mapped.over(1, x => x * 3)).toThrow()
+
+      expect(source.over(['a', 0], x => x - 5)()).toEqual({ a: [-1] })
     })
   })
 })

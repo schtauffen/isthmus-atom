@@ -2,8 +2,13 @@ import { curry } from 'crry'
 
 export const view = curry(_view)
 export const set = curry(_set)
+export const over = curry(_over)
 
-export function _view (lens, target) {
+function _over (lens, visitor, target) {
+  return _set(lens, visitor(_view(lens, target)), target)
+}
+
+function _view (lens, target) {
   if (lens == null) return target
   if (target == null) return undefined
 
@@ -36,7 +41,7 @@ function setPath (path, value, target) {
   return _set(path[0], setPath(path.slice(1), value, target[path[0]]), target)
 }
 
-export function _set (path, value, target) {
+function _set (path, value, target) {
   var result, i, il
 
   if (path == null) return value

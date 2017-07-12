@@ -1,5 +1,5 @@
 /* eslint-env jest */
-import { set, view } from '../optics'
+import { set, view, over } from '../optics'
 import deepFreeze from 'deep-freeze'
 
 describe('set', () => {
@@ -171,5 +171,15 @@ describe('view', () => {
     expect(view([undefined], target)).toEqual(target)
     expect(view(['a', undefined], target)).toEqual([0, { b: 7 }])
     expect(view(['a', undefined, 1], target)).toEqual({ b: 7 })
+  })
+})
+
+describe('over', () => {
+  it('should set lens via function', () => {
+    const target = { a: ['foo', 'bar'] }
+    deepFreeze(target)
+
+    expect(over('a', s => s.concat('biz'), target)).toEqual({ a: ['foo', 'bar', 'biz'] })
+    expect(over(['a', 1], s => s.toUpperCase(), target)).toEqual({ a: ['foo', 'BAR'] })
   })
 })

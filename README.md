@@ -15,10 +15,10 @@ computed atom:
 ## Why @isthmus/atom?
 This library intends to focus on being a powerful tool, while maintaing a small footprint and staying approachable. If you would like to use streams/atoms but fear about bloat then this may be a good choice for you.   
 
-The UMD build (as of 6/30/2017) clocks in at 2.4kB gzipped:
+The UMD build (as of 6/30/2017) clocks in at 2.5kB gzipped:
 ```bash
 > gzip -c dist/atom.js | wc -c
-2453
+2532
 ```
 
 ## Installation
@@ -50,6 +50,7 @@ Note that all functions without optional arguments are curried with `crry`.
   * [map](#map)
   * [view](#view)
   * [set](#set)
+  * [over](#over)
   * [remove](#remove)
   * [isAtom](#isatom)
   * [modify](#modify)
@@ -138,16 +139,29 @@ const head = atom.view(0) // 'a'
 ### set
 > set(lens, value, atom) --> atom  
 
-`set` allows you to change an atom's value by supplied lens. It returns the effected atom.
+`set` allows you to change an atom's value by supplied lens. It returns the affected atom.
 ```js
 const source = Atom({ foo: [1, 2, 3] })
-const lensed = source.view('foo')
 
 set(['foo', 1], 7, source) // { foo: [1, 7, 3] }
 ```
 for convenience, each atom has a `set` method bound to it:
 ```js
 source.set(['foo', 2], 11) // { foo: [1, 7, 11] }
+```
+
+### over
+> over(lens, fn, atom) --> atom  
+
+`over` allows you to change an atom's value by supplied lens by applying a function to it. It returns the affected atom.
+```js
+const source = Atom({ foo: [1, 2, 3] })
+
+over(['foo', 1], x => x - 3, source) // { foo: [1, -1, 3] }
+```
+for convenience, each atom has an `over` method bound to it:
+```js
+source.over(['foo', 2], x => x * 2) // { over: [1, -1, 6] }
 ```
 
 ### remove
