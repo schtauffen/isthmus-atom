@@ -19,7 +19,8 @@
     "webpack": "cross-env NODE_ENV=production webpack -p --display-optimization-bailout",
     "test": "run-s lint test:unit",
     "test:unit": "jest --coverage",
-    "test:watch": "jest --coverage --watch"
+    "test:watch": "jest --coverage --watch",
+    "release": "xyz --repo git@github.com:schtauffen/isthmus-atom.git --increment"
   },
   "author": "Zach Dahl <z.schtauffen@gmail.com>",
   "license": "ISC",
@@ -48,10 +49,11 @@
     "deep-freeze": "0.0.1",
     "jest": "^20.0.4",
     "npm-run-all": "^4.0.2",
+    "ramda": "^0.24.1",
     "sinon": "^2.3.5",
     "standard": "^10.0.2",
-    "ramda": "^0.24.1",
-    "webpack": "^3.0.0"
+    "webpack": "^3.0.0",
+    "xyz": "^2.1.0"
   },
   "dependencies": {
     "crry": "^1.1.1"
