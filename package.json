@@ -1,6 +1,6 @@
 {
   "name": "@isthmus/atom",
-  "version": "1.0.0-rc5",
+  "version": "1.0.0-rc6",
   "description": "A minimalist atom implementation",
   "main": "cjs/index.js",
   "module": "lib/index.js",
