@@ -1,2 +1,2 @@
-import * as isthmus from './'
-export { isthmus }
+import * as isthmusAtom from './'
+export { isthmusAtom }

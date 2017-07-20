@@ -8,7 +8,7 @@ import {
   set as _set,
   view as _view,
   over as _over
-} from './optics'
+} from '@isthmus/optics'
 
 if (process.env.NODE_ENV !== 'production') {
   var assert = require('./assert')

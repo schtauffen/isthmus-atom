@@ -1,6 +1,6 @@
 {
   "name": "@isthmus/atom",
-  "version": "1.0.0-rc6",
+  "version": "1.0.0-rc7",
   "description": "A minimalist atom implementation",
   "main": "cjs/index.js",
   "module": "lib/index.js",
@@ -56,6 +56,7 @@
     "xyz": "^2.1.0"
   },
   "dependencies": {
+    "@isthmus/optics": "^1.0.0-rc1",
     "crry": "^1.1.1"
   }
 }
