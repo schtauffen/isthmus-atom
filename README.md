@@ -114,7 +114,7 @@ for convenience, each atom has a `map` method bound to it:
 const doubled = n.map(R.multiply(2)) // 6
 ```
 
-It is also inclued as `atom['fantasyland/map']` to support the Fantasyland [Functor](https://github.com/fantasyland/fantasy-land#functor) spec.  
+It is also inclued as `atom['fantasyland/map']` to support the fantasyland [Functor](https://github.com/fantasyland/fantasy-land#functor) spec.  
 
 ### view
 > view(lens, atom) --> lensed atom  
@@ -343,7 +343,7 @@ atom.end()
 ### ap
 > atom1.ap(atom2)
 
-This is included as `atom['fantasyland/ap']` to support the Fantasyland [Apply](https://github.com/fantasyland/fantasy-land#apply) spec.  
+This is included as `atom['fantasyland/ap']` to support the fantasyland [Apply](https://github.com/fantasyland/fantasy-land#apply) spec.  
 It is aliased as `atom.ap` for convenience.  
 
 ```js
@@ -356,7 +356,7 @@ y.ap(u) // 49
 ### of
 > Atom.of(atom2)  
 
-This is included as `Atom['fantasyland/of']` to support the Fantasyland [Applicative](https://github.com/fantasyland/fantasy-land#applicative) spec.  
+This is included as `Atom['fantasyland/of']` to support the fantasyland [Applicative](https://github.com/fantasyland/fantasy-land#applicative) spec.  
 It is aliased as `Atom.of` for convenience.  
 
 ```js
