@@ -15,10 +15,10 @@ computed atom:
 ## Why @isthmus/atom?
 This library intends to focus on being a powerful tool, while maintaing a small footprint and staying approachable. If you would like to use streams/atoms but fear about bloat then this may be a good choice for you.   
 
-The UMD build (as of 7/19/2017) clocks in at 2.5kB gzipped:
+The UMD build (as of 7/31/2017) clocks in at 2.6kB gzipped:
 ```bash
 > gzip -c dist/atom.js | wc -c
-2530
+2612
 ```
 
 ## Installation
