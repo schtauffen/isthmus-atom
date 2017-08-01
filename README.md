@@ -61,8 +61,10 @@ Note that all functions without optional arguments are curried with `crry`.
   * [log](#log)
   * [toJSON](#atomtojson)
   * [valueOf](#atomvalueof)
-  * [HALT](#halt)
-[fantasyland](#fantasyland)
+  * [HALT](#halt)  
+  
+[fantasyland](#fantasyland)  
+  * [map](#map)
   * [of](#of)
   * [ap](#ap)
 
