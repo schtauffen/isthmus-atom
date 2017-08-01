@@ -62,6 +62,9 @@ Note that all functions without optional arguments are curried with `crry`.
   * [toJSON](#atomtojson)
   * [valueOf](#atomvalueof)
   * [HALT](#halt)
+[fantasyland](#fantasyland)
+  * [of](#of)
+  * [ap](#ap)
 
 ### Atom
 > Atom(any?) -> atom  
@@ -108,6 +111,8 @@ for convenience, each atom has a `map` method bound to it:
 ```js
 const doubled = n.map(R.multiply(2)) // 6
 ```
+
+It is also inclued as `atom['fantasyland/map']` to support the Fantasyland [Functor](https://github.com/fantasyland/fantasy-land#functor) spec.  
 
 ### view
 > view(lens, atom) --> lensed atom  
@@ -332,6 +337,32 @@ const atom = Atom(foo)
 // later
 atom.end()
 ```
+
+### ap
+> atom1.ap(atom2)
+
+This is included as `atom['fantasyland/ap']` to support the Fantasyland [Apply](https://github.com/fantasyland/fantasy-land#apply) spec.  
+It is aliased as `atom.ap` for convenience.  
+
+```js
+const y = Atom(7)
+const u = Atom(x => x * x)
+
+y.ap(u) // 49
+```
+
+### of
+> Atom.of(atom2)  
+
+This is included as `Atom['fantasyland/of']` to support the Fantasyland [Applicative](https://github.com/fantasyland/fantasy-land#applicative) spec.  
+It is aliased as `Atom.of` for convenience.  
+
+```js
+const x = Atom.of(7) // same as Atom(7)
+```
+
+## fantasyland
+[fantasyland](https://github.com/fantasyland/fantasy-land) is a set of specifications for algebraic structures to promote interop between libraries.  
 
 ## Acknowledgements
 _@isthmus/atom_ draws inspiration from [mithril streams](https://github.com/MithrilJS/mithril.js/blob/master/docs/stream.md), [flyd](https://github.com/paldepind/flyd) and [calmm-js](https://github.com/calmm-js/documentation/blob/master/introduction-to-calmm.md). It utilizes [crry](https://github.com/schtauffen/crry) and [@isthmus/optics](https://github.com/schtauffen/isthmus-optics) as its dependencies.
