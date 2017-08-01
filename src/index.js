@@ -151,6 +151,13 @@ function _remove (atom) {
   return atom(undefined)
 }
 
+var ap = curry(_ap)
+function _ap (x, f) {
+  return combine(function (a, b) {
+    return a(b)
+  }, [f, x])
+}
+
 export var Atom = function Atom (value) {
   atom.isAtom = true
   atom.type = TYPES.ATOM
@@ -166,7 +173,6 @@ export var Atom = function Atom (value) {
   atom.lens = null
   atom.source = null
 
-  atom.map = map(__, atom)
   atom.view = view(__, atom)
   atom.scan = scan(__, __, atom)
   atom.modify = modify(__, atom)
@@ -175,6 +181,13 @@ export var Atom = function Atom (value) {
   atom.log = log.bind(null, atom)
   atom.set = set(__, __, atom)
   atom.over = over(__, __, atom)
+
+  // fantasyland
+  atom.map = map(__, atom)
+  atom.ap = ap(atom)
+  atom.constructor = Atom
+  atom['fantasyland/map'] = atom.map
+  atom['fantasyland/ap'] = atom.ap
 
   atom.toJSON = toJSON.bind(null, atom)
   atom.valueOf = valueOf.bind(null, atom)
@@ -187,6 +200,8 @@ export var Atom = function Atom (value) {
       : atom.value
   }
 }
+Atom.of = Atom
+Atom['fantasyland/of'] = Atom.of
 
 export default Atom
 

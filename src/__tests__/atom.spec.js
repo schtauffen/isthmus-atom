@@ -100,6 +100,71 @@ describe('combine', () => {
   })
 })
 
+describe('fantasyland', () => {
+  describe('Functor', () => {
+    it('should do identity', () => {
+      const u = Atom(7)
+      expect(u()).toBe(u.map(a => a)())
+    })
+
+    it('should compose', () => {
+      const u = Atom(7)
+      const f = x => x * x
+      const g = x => x - 9
+
+      const a = u.map(x => f(g(x)))
+      const b = u.map(g).map(f)
+
+      expect(a()).toBe(4)
+      expect(b()).toBe(4)
+    })
+  })
+
+  describe('Apply', () => {
+    it('should compose', () => {
+      const v = Atom(7)
+      const u = Atom(x => x + x)
+      const a = Atom(x => x - 4)
+
+      const r1 = v.ap(u.ap(a.map(f => g => x => f(g(x)))))
+      const r2 = v.ap(u).ap(a)
+
+      expect(r1()).toBe(10)
+      expect(r2()).toBe(10)
+    })
+  })
+
+  describe('Applicative', () => {
+    it('should adhere to identity', () => {
+      const v = Atom('a')
+      const r = v.ap(Atom.of(x => x))
+      expect(r()).toBe('a')
+    })
+
+    it('should be homomorphic', () => {
+      const x = 'a'
+      const f = s => s.toUpperCase()
+
+      const r1 = Atom.of(x).ap(Atom.of(f))
+      expect(r1()).toBe('A')
+
+      const r2 = Atom.of(f(x))
+      expect(r2()).toBe('A')
+    })
+
+    it('should interchange', () => {
+      const y = []
+      const u = Atom(a => a.concat(9))
+
+      const r1 = Atom.of(y).ap(u)
+      expect(r1()).toEqual([9])
+
+      const r2 = u.ap(Atom.of(f => f(y)))
+      expect(r2()).toEqual([9])
+    })
+  })
+})
+
 describe('view', () => {
   it('should throw if not given atom', () => {
     expect(() => view(0, 123)).toThrow()
@@ -383,13 +448,21 @@ describe('isAtom', () => {
     expect(isAtom()(Atom(1))).toBe(true)
   })
 
-  it('should return tree for atoms', () => {
+  it('should return true for atoms', () => {
     const atom = Atom({ a: 7 })
     const lensed = view('a', atom)
     const computed = map(x => ({ ...x, b: 9 }), atom)
     expect(isAtom(atom)).toBe(true)
     expect(isAtom(lensed)).toBe(true)
     expect(isAtom(computed)).toBe(true)
+  })
+
+  it('should return false for non-atoms', () => {
+    expect(isAtom(1)).toBe(false)
+    expect(isAtom(null)).toBe(false)
+    expect(isAtom(undefined)).toBe(false)
+    expect(isAtom({})).toBe(false)
+    expect(isAtom([])).toBe(false)
   })
 })
 
