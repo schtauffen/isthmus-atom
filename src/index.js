@@ -55,13 +55,14 @@ export function log () {
 function addToSinkStack (stack, sinks) {
   for (var i = 0, il = sinks.length; i < il; ++i) {
     var sink = sinks[i]
-    if (sink.updateIndex !== null) {
-      for (var j = sink.updateIndex, jl = stack.length; j < jl; ++j) {
-        stack[j] = stack[j + 1]
+
+    if (sink.updateIndex == null) {
+      stack[sink.updateIndex = stack.length] = sink
+    } else {
+      for (var j = sink.updateIndex, jl = stack.length - 1; j < jl; ++j) {
+        stack[stack[j + 1].updateIndex = j] = stack[j + 1]
       }
       stack[sink.updateIndex = stack.length - 1] = sink
-    } else {
-      stack[sink.updateIndex = stack.length] = sink
     }
 
     addToSinkStack(stack, sink.sinks)

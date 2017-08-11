@@ -97,6 +97,31 @@ describe('combine', () => {
       sources[1](3)
       expect(atom()).toBe(2)
     })
+
+    it('should work in diamond dependencies', () => {
+      const a = Atom(1)
+      const b = a.view(null)
+      const c = a.view(null)
+      const d = combine(R.add, [b, c])
+      const e = d.map(R.identity)
+
+      const steps = [
+        [1, 2],
+        [2, 4],
+        [3, 6],
+        [4, 8],
+        [5, 10],
+        [-1, -2]
+      ]
+
+      steps.forEach(([val, doubled]) => {
+        a(val)
+        expect(b()).toBe(val)
+        expect(c()).toBe(val)
+        expect(d()).toBe(doubled)
+        expect(e()).toBe(doubled)
+      })
+    })
   })
 })
 
