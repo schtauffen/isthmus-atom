@@ -683,6 +683,7 @@ describe('HALT', () => {
     const bc = combine((b, c) => b + c, [b, c])
     const c2 = map(R.multiply(2), c)
     const ac = combine((a, c) => a + c, [a, c])
+    const aac = combine((a, ac) => a + ac, [a, ac])
 
     expect(a()).toBe(2)
     expect(b()).toBe(3)
@@ -691,6 +692,7 @@ describe('HALT', () => {
     expect(bc()).toBe(7)
     expect(c2()).toBe(8)
     expect(ac()).toBe(6)
+    expect(aac()).toBe(8)
 
     const sandbox = sinon.sandbox.create()
     const called = [
@@ -700,11 +702,11 @@ describe('HALT', () => {
     const notCalled = [
       sandbox.spy(c2, 'update'),
       sandbox.spy(bc, 'update'),
-      sandbox.spy(ac, 'update')
+      sandbox.spy(ac, 'update'),
+      sandbox.spy(aac, 'update')
     ]
 
     a(3)
-
     expect(b()).toBe(4)
     expect(b2()).toBe(12)
     called.forEach(spy => expect(spy.called).toBe(true))
