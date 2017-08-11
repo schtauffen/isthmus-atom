@@ -15,10 +15,10 @@ computed atom:
 ## Why @isthmus/atom?
 This library intends to focus on being a powerful tool, while maintaing a small footprint and staying approachable. If you would like to use streams/atoms but fear about bloat then this may be a good choice for you.   
 
-The UMD build (as of 7/31/2017) clocks in at 2.6kB gzipped:
+The UMD build (as of 8/10/2017) clocks in at 2.6kB gzipped:
 ```bash
 > gzip -c dist/atom.js | wc -c
-2612
+2636
 ```
 
 ## Installation
@@ -49,6 +49,7 @@ Note that all functions without optional arguments are curried with `crry`.
   * [combine](#combine)
   * [map](#map)
   * [view](#view)
+  * [get](#get)
   * [set](#set)
   * [over](#over)
   * [remove](#remove)
@@ -131,9 +132,9 @@ const readonly = view(['foo', 1], mapped) // 2; is readonly so readonly(7) -> Er
 `undefined` or `null` as a lens, or in a lens path, will be treated like an identity lens. This can be useful for making separate trees that may be ended simultaneously.  
 ```js
 const source = Atom({ foo: [1, 2, 3] })
-const lensed = source.view('foo')
-const proxy = source.view(null)
-const proxiedLensed = proxy.view('foo')
+const lensed = view('foo', source)
+const proxy = view(null, source)
+const proxiedLensed = view('foo', proxy)
 
 proxy.end() // proxiedLensed is ended, lensed is still alive
 ```
@@ -141,6 +142,19 @@ for convenience, each atom has a `view` method bound to it:
 ```js
 const atom = Atom(['a', 'b', 'c'])
 const head = atom.view(0) // 'a'
+```
+
+### get
+> get(lens, atom) --> value  
+
+`get` allows you to retrieve an atom's value by supplied lens.  
+```js
+const source = Atom({ foo: [7, 9, 11] })
+get(['foo', 2], source) // 11
+```
+for convenience, each atom has a `get` method bound to it:
+```js
+source.get(['foo', 1]) // 9
 ```
 
 ### set

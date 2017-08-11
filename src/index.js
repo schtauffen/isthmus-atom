@@ -132,7 +132,6 @@ function _end (atom) {
 
   atom.type = TYPES.ENDED
   atom.readonly = true
-  atom.value = null
   atom.update = null
   atom.compute = null
   atom.lens = null
@@ -174,6 +173,7 @@ export var Atom = function Atom (value) {
   atom.lens = null
   atom.source = null
 
+  atom.get = get(__, atom)
   atom.view = view(__, atom)
   atom.scan = scan(__, __, atom)
   atom.modify = modify(__, atom)
@@ -244,6 +244,13 @@ function _combine (compute, sources) {
   atom.value = atom.compute.apply(null, values)
   return atom
 }
+
+export var get = curry(function get (lens, atom) {
+  if (process.env.NODE_ENV !== 'production') {
+    assert.isAtom('view', atom)
+  }
+  return _view(lens, atom.value)
+})
 
 export var view = curry(function view (lens, source) {
   if (process.env.NODE_ENV !== 'production') {

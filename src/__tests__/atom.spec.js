@@ -2,6 +2,7 @@
 import R from 'ramda'
 import Atom, {
   combine,
+  get,
   end,
   isAtom,
   map,
@@ -187,6 +188,20 @@ describe('fantasyland', () => {
       const r2 = u.ap(Atom.of(f => f(y)))
       expect(r2()).toEqual([9])
     })
+  })
+})
+
+describe('get', () => {
+  it('should return value at lens', () => {
+    const atom = Atom({ foo: [7, 9, 11] })
+    expect(get('foo', atom)).toEqual([7, 9, 11])
+    expect(get(['foo', 1], atom)).toBe(9)
+  })
+
+  it('should be bound to atoms', () => {
+    const atom = Atom({ foo: [7, 9, 11] })
+    expect(atom.get('foo')).toEqual([7, 9, 11])
+    expect(atom.get(['foo', 1])).toBe(9)
   })
 })
 
@@ -421,7 +436,8 @@ describe('end', () => {
   it('should turn the stream off', () => {
     const atom = Atom(123)
     end(atom)
-    expect(atom()).toBe(null)
+    expect(atom()).toBe(123)
+    expect(atom.type).toBe('@@isthmus/atom/ended')
     expect(() => atom(7)).toThrow()
   })
 
