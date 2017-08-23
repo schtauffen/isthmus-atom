@@ -482,6 +482,16 @@ describe('end', () => {
       expect(second.type).toBe('@@isthmus/atom/ended')
     })
   })
+
+  it('should work with multiple descendants', () => {
+    const source = Atom('taco')
+    const child1 = source.map(t => `${t} bar`)
+    const child2 = source.map(t => `${t} salad`)
+    source.end()
+    expect(source.type).toBe('@@isthmus/atom/ended')
+    expect(child1.type).toBe('@@isthmus/atom/ended')
+    expect(child2.type).toBe('@@isthmus/atom/ended')
+  })
 })
 
 describe('isAtom', () => {

@@ -126,8 +126,8 @@ function _end (atom) {
     source.sinks.splice(index, 1)
   }
 
-  for (var j = 0, jl = atom.sinks.length; j < jl; ++j) {
-    _end(atom.sinks[j])
+  while (atom.sinks.length) {
+    _end(atom.sinks[0])
   }
 
   atom.type = TYPES.ENDED
