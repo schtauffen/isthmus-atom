@@ -15,7 +15,7 @@ computed atom:
 ## Why @isthmus/atom?
 This library intends to focus on being a powerful tool, while maintaing a small footprint and staying approachable. If you would like to use streams/atoms but fear about bloat then this may be a good choice for you.   
 
-The UMD build (as of 9/22/2017) clocks in at 2.5kB gzipped:
+The browser build (as of 9/22/2017) clocks in at 2.5kB gzipped:
 ```bash
 > gzip -c dist/atom.js | wc -c
 2559
@@ -34,11 +34,11 @@ import { Atom, combine, scanMerge } from '@isthmus/atom'
 // and then use...
 ```
 
-There is a umd version available under `@isthmus/atom/dist/atom.js`:
+There is a browser version available under `@isthmus/atom/dist/atom.js`:
 ```html
 <script src="https//unpkg.com/@isthmus/atom/dist/atom.js"></script>
 <script>
-  const { Atom, scan, HALT } = isthmusAtom
+  const { Atom, scan, HALT } = isthmus.atom
   // ...
 </script>
 ```
